@@ -1,0 +1,31 @@
+<div>
+  select db and table {{selectedDbName}}
+  <form name="connectionSetup">
+    <select name="dbName" [(ngModel)]="selectedDbName" (change)="onDbNameChange()" placeholder="database">
+      <option *ngFor="let dbName of databaseNames" [value]="dbName">
+        {{dbName}}
+      </option>
+    </select>
+    <select name="tableName" [(ngModel)]="selectedTableName" (change)="onTableNameChange()" placeholder="table">
+      <option *ngFor="let tableName of tableNames" [value]="tableName">
+        {{tableName}}
+      </option>
+    </select>
+  </form>
+</div>
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Primary Key ({{selectedTablePrimKeyName}})</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let dataRow of data">
+        <td>{{dataRow[selectedTablePrimKeyName]}}</td>
+        <td>{{dataRow | json}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
