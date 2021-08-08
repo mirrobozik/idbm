@@ -25,6 +25,7 @@
       <tr *ngFor="let dataRow of data">
         <td>{{dataRow[selectedTablePrimKeyName]}}</td>
         <td>{{dataRow | json}}</td>
+        <td><button type="button" (click)="edit(dataRow)">edit</button></td>
       </tr>
     </tbody>
   </table>

@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import Dexie from 'dexie';
+import { DataEditorDialog } from './data-editor/data-editor.dialog';
 
 @Component({
   selector: 'lib-idbm',
-  templateUrl: './idbm.component.html',
-  styles: [
-  ]
+  templateUrl: './idbm.component.html'
 })
 export class IdbmComponent implements OnInit {
 
-  constructor() { }
+  constructor(private dataEditorDialog: DataEditorDialog) { }
 
   databaseNames: string[] = [];
   selectedDbName?: string;
@@ -21,6 +20,25 @@ export class IdbmComponent implements OnInit {
   ngOnInit(): void {
     Dexie.getDatabaseNames().then(names => {
       this.databaseNames = names;
+    });
+  }
+
+  private loadTableData(dbName: string, tableName: string) {
+    let db = new Dexie(dbName);
+    db.open().then(() => {
+      this.selectedTablePrimKeyName = db.table(this.selectedTableName!).schema.primKey.name;
+      db.table(tableName)
+        .toArray()
+        .then(data => {
+          this.data = data;
+        })
+        .catch((e) => {
+          console.log(e);
+        })
+        .finally(() => {
+          db.close();
+        })
+        ;
     });
   }
 
@@ -43,19 +61,36 @@ export class IdbmComponent implements OnInit {
   onTableNameChange() : void {
     if (this.selectedDbName && this.selectedTableName) {
       this.data = [];
-      let db = new Dexie(this.selectedDbName);
-      db.open().then(() => {
-        console.log(db.table(this.selectedTableName!).schema);
-        this.selectedTablePrimKeyName = db.table(this.selectedTableName!).schema.primKey.name;
-        db.table(this.selectedTableName!)
-          .toArray()
-          .then(data => {
-            this.data = data;
-            console.log(data);
-            db.close();
-          });
-      });
+      this.loadTableData(this.selectedDbName, this.selectedTableName);
     }
+  }
+
+  edit(dataRow: any) : void {
+    const copy = Object.assign({}, dataRow);
+    this.dataEditorDialog
+      .open(copy)
+      ?.then((data)=> {
+        console.log('save', data);
+        let db = new Dexie(this.selectedDbName!);
+        db.open().then(() => {
+          db.table(this.selectedTableName!)
+            .put(data, dataRow[this.selectedTablePrimKeyName])
+            .then(() => {
+              db.close();
+            })
+            .catch((e)=> {
+              console.log(e);
+            })
+            .finally(() => {
+              db.close();
+            })
+            ;
+        });
+      })
+      .catch(()=>{
+        console.log('rejected/closed');
+      })
+      ;
   }
 
 }

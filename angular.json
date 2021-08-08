@@ -5,6 +5,11 @@
   "projects": {
     "idbm": {
       "projectType": "library",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "projects/idbm",
       "sourceRoot": "projects/idbm/src",
       "prefix": "lib",
