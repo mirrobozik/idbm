@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import Dexie from 'dexie';
 import { DataEditorDialog } from './data-editor/data-editor.dialog';
+import { TableInfo } from './database-explorer/table-info.model';
 
 @Component({
   selector: 'lib-idbm',
@@ -10,23 +11,24 @@ export class IdbmComponent implements OnInit {
 
   constructor(private dataEditorDialog: DataEditorDialog) { }
 
-  databaseNames: string[] = [];
-  selectedDbName?: string;
-  tableNames: string[] = [];
-  selectedTableName?: string;
   selectedTablePrimKeyName: string = 'id';
+  tableInfo?: TableInfo;
   data: any[] = [];
 
   ngOnInit(): void {
-    Dexie.getDatabaseNames().then(names => {
-      this.databaseNames = names;
-    });
+  }
+
+  onTableSelected(evt: TableInfo): void {
+    this.tableInfo = evt;
+    if (evt) {
+      this.loadTableData(evt.databaseName, evt.tableName);
+    }
   }
 
   private loadTableData(dbName: string, tableName: string) {
     let db = new Dexie(dbName);
     db.open().then(() => {
-      this.selectedTablePrimKeyName = db.table(this.selectedTableName!).schema.primKey.name;
+      this.selectedTablePrimKeyName = db.table(tableName).schema.primKey.name;
       db.table(tableName)
         .toArray()
         .then(data => {
@@ -42,38 +44,18 @@ export class IdbmComponent implements OnInit {
     });
   }
 
-  onDbNameChange() : void {
-    if (this.selectedDbName) {
-      this.tableNames = [];
-      this.selectedTableName = undefined;
-
-      let db = new Dexie(this.selectedDbName);
-      db.open().then(()=>{
-        db.tables.forEach(table => {
-          console.log(table.name);
-          this.tableNames.push(table.name);
-        });
-        db.close();
-      });
-    }
-  }
-
-  onTableNameChange() : void {
-    if (this.selectedDbName && this.selectedTableName) {
-      this.data = [];
-      this.loadTableData(this.selectedDbName, this.selectedTableName);
-    }
-  }
-
   edit(dataRow: any) : void {
+    if (!this.tableInfo) {
+      return;
+    }
     const copy = Object.assign({}, dataRow);
     this.dataEditorDialog
       .open(copy)
       ?.then((data)=> {
         console.log('save', data);
-        let db = new Dexie(this.selectedDbName!);
+        let db = new Dexie(this.tableInfo?.databaseName!);
         db.open().then(() => {
-          db.table(this.selectedTableName!)
+          db.table(this.tableInfo?.tableName!)
             .put(data, dataRow[this.selectedTablePrimKeyName])
             .then(() => {
               db.close();

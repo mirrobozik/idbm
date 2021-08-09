@@ -1,19 +1,7 @@
 <div>
-  select db and table {{selectedDbName}}
-  <form name="connectionSetup">
-    <select name="dbName" [(ngModel)]="selectedDbName" (change)="onDbNameChange()" placeholder="database">
-      <option *ngFor="let dbName of databaseNames" [value]="dbName">
-        {{dbName}}
-      </option>
-    </select>
-    <select name="tableName" [(ngModel)]="selectedTableName" (change)="onTableNameChange()" placeholder="table">
-      <option *ngFor="let tableName of tableNames" [value]="tableName">
-        {{tableName}}
-      </option>
-    </select>
-  </form>
-</div>
-<div>
+
+  <lib-database-explorer (tableSelected)="onTableSelected($event)"></lib-database-explorer>
+
   <table>
     <thead>
       <tr>
@@ -29,4 +17,5 @@
       </tr>
     </tbody>
   </table>
+
 </div>

@@ -1,0 +1,21 @@
+<form name="connectionSetup">
+
+  <select name="dbName"
+    [(ngModel)]="selectedDbName"
+    (change)="onDbNameChange()">
+    <option *ngFor="let dbName of databaseNames" [value]="dbName">
+      {{dbName}}
+    </option>
+  </select>
+
+  <br/>
+
+  <select name="tableName"
+    [(ngModel)]="selectedTableName"
+    (change)="onTableNameChange()">
+    <option *ngFor="let tableName of tableNames" [value]="tableName">
+      {{tableName}}
+    </option>
+  </select>
+
+</form>

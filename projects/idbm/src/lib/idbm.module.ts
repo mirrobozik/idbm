@@ -4,11 +4,13 @@ import { FormsModule } from "@angular/forms";
 import { OverlayModule } from "@angular/cdk/overlay";
 import { IdbmComponent } from './idbm.component';
 import { DataEditorComponent } from './data-editor/data-editor.component';
+import { DatabaseExplorerComponent } from './database-explorer/database-explorer.component';
 
 @NgModule({
   declarations: [
     IdbmComponent,
-    DataEditorComponent
+    DataEditorComponent,
+    DatabaseExplorerComponent
   ],
   imports: [
     CommonModule,
